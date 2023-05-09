@@ -65,6 +65,7 @@
         v-for="(track, index) in tracks"
         :key="itemKey === 'id' ? track.id : `${track.id}${index}`"
         :track-prop="track"
+        :track-no="index + 1"
         :highlight-playing-track="highlightPlayingTrack"
         @dblclick.native="playThisList(track.id || track.songId)"
         @click.right.native="openMenu($event, track, index)"
@@ -272,10 +273,15 @@ export default {
       }
     },
     copyLink() {
-      navigator.clipboard.writeText(
+      this.$copyText(
         `https://music.163.com/song?id=${this.rightClickedTrack.id}`
-      );
-      this.showToast(locale.t('toast.copied'));
+      )
+        .then(() => {
+          this.showToast(locale.t('toast.copied'));
+        })
+        .catch(err => {
+          this.showToast(`${locale.t('toast.copyFailed')}${err}`);
+        });
     },
     removeTrackFromQueue() {
       this.$store.state.player.removeTrackFromQueue(
